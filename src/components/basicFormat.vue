@@ -85,13 +85,15 @@
   import expenseContent from './expenseContent'
   import boardContent from './boardContent'
   import requestContent from './requestContent'
+  import loginContent from './loginContent'
 	
   export default {
     components: {
       homeContent : homeContent,
 	  expenseContent : expenseContent,
 	  boardContent : boardContent,
-	  requestContent : requestContent
+	  requestContent : requestContent,
+	  loginContent : loginContent,
 	  
     },
 	created(){
@@ -106,7 +108,7 @@
         { icon: 'history', text: '지출관리', route : '/expense'},
         { icon: 'content_copy', text: '판매현황', route : '/board'},
 		{ icon: 'content_copy', text: '물품추천', route : '/request'},
-        { icon: 'chat_bubble', text: 'Send feedback', route : '/' },
+        { icon: 'chat_bubble', text: '로그인', route : '/login' },
         { icon: 'help', text: 'Help', route :  '/' },
         { icon: 'phonelink', text: 'App downloads', route :  '/' },
 
@@ -128,6 +130,8 @@
 				case "expense" : this.component = "expenseContent"; break;
 				case "board" : this.component = "boardContent" ; break;
 				case "request" : this.component = "requestContent" ; break;
+				case "request" : this.component = "requestContent" ; break;
+				case "login" : this.component = "loginContent" ; break;
 			}
 		}
 	},

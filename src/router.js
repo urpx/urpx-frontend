@@ -7,7 +7,7 @@ import homeContent from './components/homeContent.vue'
 import boardContent from './components/boardContent.vue'
 import expenseContent from './components/expenseContent.vue'
 import requestContent from './components/requestContent.vue'
-
+import loginContent from './components/loginContent.vue'
 
 
 Vue.use(Router)
@@ -34,6 +34,11 @@ export default new Router({
       name: 'expense',
 	  component : expenseContent
     },
+	{
+	  path : '/login',
+	  name : 'login',
+	  component : loginContent
+	}
 	  
 	  
   ]
