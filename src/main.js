@@ -6,12 +6,20 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './registerServiceWorker'
+import axios from 'axios'
 
 Vue.config.productionTip = false
 
 import VueGoogleCharts from 'vue-google-charts' 
 Vue.use(VueGoogleCharts)
+import VueCookies from 'vue-cookies'
+Vue.use(VueCookies)
 
+const base = axios.create({
+  baseURL: 'http://urpx.herokuapp.com/',
+})
+
+Vue.prototype.$http = base
 
 new Vue({
   router,
