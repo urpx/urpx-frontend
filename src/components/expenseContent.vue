@@ -7,8 +7,8 @@
 			  <v-flex xs12 sm4 md4>
 				<v-text-field
 				  label="금액"
-				  v-model="addItem.value"
-				  :rules="valueRules"
+				  v-model="addItem.amount"
+				  :rules="amountRules"
 				  outline
 				  required
 				></v-text-field>
@@ -40,7 +40,7 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field v-model="editedItem.value" label="Dessert name"></v-text-field>
+                  <v-text-field v-model="editedItem.amount" label="Dessert name"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
                   <v-text-field v-model="editedItem.description" label="Calories"></v-text-field>
@@ -64,8 +64,8 @@
       class="elevation-1"
     >
       <template v-slot:items="props">
-        <td>{{ props.item.time }}</td>
-        <td class="text-xs-left">{{ props.item.value }}</td>
+        <td>{{ props.item.created_at }}</td>
+        <td class="text-xs-left">{{ props.item.amount }}</td>
         <td class="text-xs-left">{{ props.item.description }}</td>
         <td class="justify-center layout px-0">
           <v-icon
@@ -102,32 +102,32 @@
           text: 'Record Time',
           align: 'left',
           sortable: false,
-          value: 'time'
+          value: 'created_at'
         },
-        { text: 'Amount', value: 'value', sortable : false },
+        { text: 'Amount', value: 'amount', sortable : false },
         { text: 'Description', value: 'description', sortable:false },
       ],
       rowItems: [],
-	  valueRules : [
+	  amountRules : [
 		v => !!v || '금액을 적어주세요',
 		v => !isNaN(v) || '숫자를 입력해주세요'
 	  ],
       editedIndex: -1,
       addItem: {
-        time: '',
-        value: '',
+        created_at: '',
+        amount: '',
         description: '',
 
       },
       editedItem: {
-        time: '',
-        value: '',
+        created_at: '',
+        amount: '',
         description: '',
 
       },
       defaultItem: {
-        time: '',
-        value: '',
+        created_at: '',
+        amount: '',
         description: '',
       }
     }),
@@ -149,15 +149,6 @@
     },
 
     methods: {
-      initialize () {
-        this.rowItems = [
-          {
-            time : '2014-09-07 08:10:26',
-            value : 10000,
-            description : '슈넬치킨 맛있다.',
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.rowItems.indexOf(item)
@@ -188,12 +179,13 @@
 		 
         if (this.editedIndex > -1) {
 		  // 수정할경우
-		  this.editedItem.time = this.timeformat('2019-06-19T13:09:15.132Z')
+		  this.editedItem.created_at = this.timeformat('2019-06-19T13:09:15.132Z')
           Object.assign(this.rowItems[this.editedIndex], this.editedItem)
         } else {
           //새로 추가할경우
-		  this.addItem.time= this.timeformat('2019-06-19T13:09:15.132Z')
+		  this.addItem.created_at= this.timeformat('2019-06-19T13:09:15.132Z')
           this.rowItems.unshift(this.addItem)
+		  
         }
 		this.$refs.form.resetValidation()
         this.close()
@@ -201,7 +193,17 @@
 		
 		console.log(this.rowItems)
       },
-	  
+	  getData(){
+			this.$http.get(`/api/expenses`).then((res) => {
+				res.data.forEach((v, i) => {
+					v.created_at = this.timeformat(v.created_at)
+				})
+				this.rowItems = res.data.reverse()
+			})
+			.catch((e) => {
+				alert("서버 오류")
+			})
+	  },
 	  timeformat(time){
 			Number.prototype.padLeft = function(base,chr){
 			   var  len = (String(base || 10).length - String(this).length)+1;
@@ -221,6 +223,7 @@
     },
 	mounted(){
 		console.log(this.timeformat('2019-06-19T13:09:15.132Z'))
+		this.getData()
 	}
   }
 </script>

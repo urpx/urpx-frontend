@@ -16,7 +16,7 @@ import VueCookies from 'vue-cookies'
 Vue.use(VueCookies)
 
 const base = axios.create({
-  baseURL: 'http://urpx.herokuapp.com/',
+  baseURL: 'https://urpx.herokuapp.com/',
 })
 
 Vue.prototype.$http = base

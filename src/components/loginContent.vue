@@ -12,7 +12,7 @@
                             <v-text-field v-if="!options.isLoggingIn" v-model="user.passwordRepeat" light="light" prepend-icon="lock" label="Password Repeat" type="password"></v-text-field>
                             <v-btn v-if="options.isLoggingIn" @click.prevent="login()" block="block" type="submit">Sign in</v-btn>
                             <v-btn v-if="!options.isLoggingIn" block="block" type="submit" @click.prevent="sign();">Sign up</v-btn>
-							<v-btn v-if="!options.isLoggingIn" block="block" type="submit" @click.prevent="">return</v-btn>
+							<v-btn v-if="!options.isLoggingIn" block="block" type="submit" @click.prevent="back();">return</v-btn>
                         </v-form>
                     </v-card-text>
                 </v-card>
@@ -36,10 +36,14 @@
     	},
     options: {
       isLoggingIn: true,
-      shouldStayLoggedIn: true,
+     
     },
     }),
 	methods : {
+		back(){
+			this.initialize()
+			this.options.isLoggingIn = true
+		},
 		login(){
 			let data = {
 				email : this.user.email,

@@ -47,29 +47,8 @@
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="hidden-sm-and-down">URPX</span>
       </v-toolbar-title>
-      <v-text-field
-        flat
-        solo-inverted
-        hide-details
-        prepend-inner-icon="search"
-        label="Search"
-        class="hidden-sm-and-down"
-      ></v-text-field>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>apps</v-icon>
-      </v-btn>
-      <v-btn icon>
-        <v-icon>notifications</v-icon>
-      </v-btn>
-      <v-btn icon large>
-        <v-avatar size="32px" tile>
-          <img
-            src="https://cdn.vuetifyjs.com/images/logos/logo.svg"
-            alt="Vuetify"
-          >
-        </v-avatar>
-      </v-btn>
+	  	<span>{{ loginMessage }}</span>
     </v-toolbar>
     <v-content>
       <v-container>
@@ -87,6 +66,8 @@
   import requestContent from './requestContent'
   import loginContent from './loginContent'
 	
+  var jwtDecode = require('jwt-decode');
+	
   export default {
     components: {
       homeContent : homeContent,
@@ -98,11 +79,13 @@
     },
 	created(){
 		this.changewindow();
+		this.checkLoggedIn();
 	},
     data: () => ({
       dialog: false,
 	  component : "",
       drawer: null,
+	  loinMessage : "로그인 하세요",
       items: [
         { icon: 'contacts', text: '메인' , route : '/' },
         { icon: 'history', text: '지출관리', route : '/expense'},
@@ -117,6 +100,11 @@
     props: {
       source: String
     },
+	watch:{
+		$route (to, from){
+			this.checkLoggedIn()
+		}
+	},
 	methods : {
 		route(routelink){
 		
@@ -133,10 +121,35 @@
 				case "request" : this.component = "requestContent" ; break;
 				case "login" : this.component = "loginContent" ; break;
 			}
+		},
+		checkLoggedIn(){
+			let token = this.$cookies.get("urpx_access_token");
+
+			try{
+				let decoded = jwtDecode(token);
+				this.getUserInfo(decoded.identity)
+				this.loginMessage = "안녕하세요"
+				
+				
+			} catch(err){
+				this.loginMessage = "로그인 하세요"
+				
+			}
+		},
+		getUserInfo(id){
+			this.$http.get(`/api/users/${id}`).then((res) => {
+				console.log(res)
+			})
+			.catch((e) => {
+				alert("서버 오류")
+				this.loginMessage = "로그인 하세요"
+			})
 		}
 	},
 	mounted(){
-		this.changewindow();
+		// this.changewindow();
+		// this.checkLoggedIn();
+		
 	}
   }
 </script>
