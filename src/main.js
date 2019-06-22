@@ -15,6 +15,8 @@ Vue.use(VueGoogleCharts)
 import VueCookies from 'vue-cookies'
 Vue.use(VueCookies)
 
+Vue.prototype.$EventBus = new Vue();	
+
 const base = axios.create({
   baseURL: 'https://urpx.herokuapp.com/',
 })

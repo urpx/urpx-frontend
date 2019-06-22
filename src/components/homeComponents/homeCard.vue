@@ -1,35 +1,25 @@
 <template>
 <v-container fluid grid-list-md>
   <v-layout row wrap>
-    <v-flex xs12 sm12 md12 lg6 xl4>
-	<GChart class="spendchart"
-	  type="ColumnChart"
-	  :data="chartData"
-	  :options="chartOptions"
-	/> 
+    <v-flex class="card-section" xs12 sm12 md12 lg6 xl4>
+		<v-btn class="toggle-button" outline color="indigo" @click='drawGraph'> {{buttonMsg }} </v-btn>
+		<GChart class="spendchart"
+		  type="ColumnChart"
+		  :data="chartData"
+		  :options="chartOptions"
+		/> 
     </v-flex>
-    <v-flex xs12 sm12 md12 lg6 xl4>
+    <v-flex class="card-section" xs12 sm12 md12 lg6 xl4>
 	  <v-data-table
 		:headers="headers"
-		:items="desserts"
+		:items="rowItems"
+		:rows-per-page-items = [6]
 		class="elevation-1"
 	  >
-		<template slot="headerCell" slot-scope="props">
-		  <v-tooltip bottom>
-			<template v-slot:activator="{ on }">
-			  <span v-on="on">
-				{{ props.header.text }}
-			  </span>
-			</template>
-			<span>
-			  {{ props.header.text }}
-			</span>
-		  </v-tooltip>
-		</template>
 		<template v-slot:items="props">
-		  <td class="text-xs-left">{{ props.item.time }}</td>
-		  <td class="text-xs-left">{{ props.item.value }}</td>
-		  <td class="text-xs-left">{{ props.item.description }}</td>
+        <td>{{ props.item.created_at }}</td>
+        <td class="text-xs-left">{{ props.item.amount }}</td>
+        <td class="text-xs-left">{{ props.item.description }}</td>
 	
 		</template>
 	  </v-data-table>
@@ -42,12 +32,14 @@
 <script>
 
   import { GChart } from 'vue-google-charts'
+  import moment from 'moment'
 	
   export default {
 	components : {
 	  GChart	
 	},
     data: () => ({
+	  toggleMsg : true,
       chartData: [
         ["Year", "Value"],
         ["2014-08", 1000],
@@ -59,44 +51,101 @@
       chartOptions: {
 		legend: { position: "none" },
       },
+	  rowItems : [],
    headers: [
           {
             text: 'Record Time',
             align: 'left',
             sortable: false,
-            value: 'time'
+            value: 'created_at'
           },
           { text: 'Amount', value: 'value' },
           { text: 'Description', value: 'description' },
         ],
-        desserts: [
-          {
-            time : '2014-09-07 08:10:26',
-            value : 10000,
-            description : '슈넬치킨 맛있다.',
-          },
-          {
-            time : '2014-09-06 08:10:16',
-            value : 20000,
-            description : '근데 집에 가고 싶다.',
-          },
-
-        ]
     }),
+	computed:{
+		buttonMsg(){
+			return (this.toggleMsg ? '5일' : '5개월')
+		}
+	},
 	methods:{
+	  drawGraph(){
+		  this.toggleMsg = !this.toggleMsg
+		  if(this.toggleMsg){
+			  //5일치에 대한 차트 계산
+			  //https://stackoverflow.com/questions/10430321/how-to-parse-a-dd-mm-yyyy-or-dd-mm-yyyy-or-dd-mmm-yyyy-formatted-date-stri
+			 
+			  
+		  }else{
+			  //5개월치에 대한 차트 계산
+		  }
+	  },
+	  getData(){
+		  
+		this.rowItems = []
+		this.$http.get(`/api/expenses`).then((res) => {
+			console.log(res)
+			res.data.forEach((v, i) => {
+				v.created_at = this.timeformat(v.created_at)
+			})
+			this.rowItems = res.data.reverse()
+			console.log(this.rowItems)
+			
+		})
+		.catch((e) => {
+			alert("서버오류")
+		})
+	  },
+	  timeformat(time){
+		  	
+			Number.prototype.padLeft = function(base,chr){
+			   var  len = (String(base || 10).length - String(this).length)+1;
+			   return len > 0? new Array(len).join(chr || '0')+this : this;
+			}	
+            //UTC to KR +9hour
+			
+			var d = new Date(time),
+			dformat = [ d.getFullYear(),
+			(d.getMonth()+1).padLeft(),
+			d.getDate().padLeft()].join('/')+
+			' ' +
+		  [ d.getHours().padLeft(),
+			d.getMinutes().padLeft(),
+			d.getSeconds().padLeft()].join(':');
+		  return dformat
 
+	  }
 	},
 	  
 	mounted(){
-	
+		this.getData()
 	}
   }
 </script>
 
 <style lang="scss" scoped>
-
-	.spendchart{
-		height : 400px;
+	.container{
+		padding : 1.5rem 0;
+		
+		.card-section{
+		
+			position : relative;
+			border:	1px solid #dddddd;
+			border-radius : 10px;
+			margin-bottom : 1.5rem;
+			
+			.toggle-button{
+				position : absolute;
+				z-index : 9999 !important;
+			}
+			
+			.spendchart{
+				height : 400px;
+			}
+			.elevation-1{
+				box-shadow : none !important;
+			}
+		}
 	}
 	
 </style>

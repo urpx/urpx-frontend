@@ -78,11 +78,12 @@
 	  
     },
 	created(){
+		this.token = this.$cookies.get("urpx_access_token");
 		this.changewindow();
-		this.checkLoggedIn();
 	},
     data: () => ({
       dialog: false,
+	  token : "",
 	  component : "",
       drawer: null,
 	  loinMessage : "로그인 하세요",
@@ -101,8 +102,15 @@
       source: String
     },
 	watch:{
-		$route (to, from){
+		'token'(){
 			this.checkLoggedIn()
+			try{
+				let token = this.$cookies.get("urpx_access_token")
+				this.$http.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+				this.$EventBus.$emit('auth-token')
+			}catch(err){
+				
+			}
 		}
 	},
 	methods : {
@@ -141,7 +149,7 @@
 				console.log(res)
 			})
 			.catch((e) => {
-				alert("서버 오류")
+				
 				this.loginMessage = "로그인 하세요"
 			})
 		}

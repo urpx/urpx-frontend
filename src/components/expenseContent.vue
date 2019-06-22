@@ -60,7 +60,7 @@
     <v-data-table
       :headers="headers"
       :items="rowItems"
-	  :rows-per-page-items = [20]
+	  :rows-per-page-items = [15]
       class="elevation-1"
     >
       <template v-slot:items="props">
@@ -117,18 +117,21 @@
         created_at: '',
         amount: '',
         description: '',
+		id : '',
 
       },
       editedItem: {
         created_at: '',
         amount: '',
         description: '',
+		id : '',
 
       },
       defaultItem: {
         created_at: '',
         amount: '',
         description: '',
+		id : '',
       }
     }),
 
@@ -158,7 +161,13 @@
 
       deleteItem (item) {
         const index = this.rowItems.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.rowItems.splice(index, 1)
+		let id = item.id
+		if(confirm('Are you sure you want to delete this item?')){
+			this.$http.delete(`/api/expenses/${id}`, ).then((res) => {
+				this.rowItems.splice(index, 1)
+			})
+		} 
+		  
       },
 
       close () {
@@ -179,30 +188,60 @@
 		 
         if (this.editedIndex > -1) {
 		  // 수정할경우
-		  this.editedItem.created_at = this.timeformat('2019-06-19T13:09:15.132Z')
-          Object.assign(this.rowItems[this.editedIndex], this.editedItem)
+          this.editData()
         } else {
           //새로 추가할경우
-		  this.addItem.created_at= this.timeformat('2019-06-19T13:09:15.132Z')
-          this.rowItems.unshift(this.addItem)
-		  
+		  this.sendData()
         }
 		this.$refs.form.resetValidation()
-        this.close()
-		
-		
-		console.log(this.rowItems)
       },
 	  getData(){
-			this.$http.get(`/api/expenses`).then((res) => {
-				res.data.forEach((v, i) => {
-					v.created_at = this.timeformat(v.created_at)
-				})
-				this.rowItems = res.data.reverse()
+		  
+		this.rowItems = []
+		this.$http.get(`/api/expenses`).then((res) => {
+			res.data.forEach((v, i) => {
+				v.created_at = this.timeformat(v.created_at)
 			})
-			.catch((e) => {
-				alert("서버 오류")
-			})
+			this.rowItems = res.data.reverse()
+		})
+		.catch((e) => {
+			alert("서버 오류")
+		})
+	  },
+	  sendData(){
+		let data = {
+			description : this.addItem.description,
+			amount : Number(this.addItem.amount)
+		}  
+		this.$http.post(`/api/expenses`, data).then((res) => {
+			this.addItem = res.data;
+			this.addItem.created_at = this.timeformat(res.data.created_at)
+			this.rowItems.unshift(this.addItem)
+			this.addItem = Object.assign({}, this.defaultItem)
+			
+			this.$refs.form.resetValidation()
+		})
+		.catch((e) => {
+			alert("서버 오류")
+		})
+	  },
+	  editData(){
+		  
+		let data = {
+			description : this.editedItem.description,
+			amount : Number(this.editedItem.amount),
+		}  
+		let id = this.editedItem.id
+		  
+		this.$http.put(`/api/expenses/${id}`, data).then((res) => {
+
+			Object.assign(this.rowItems[this.editedIndex], this.editedItem)
+			this.close()
+		})
+		.catch((e) => {
+		
+			alert("서버 오류")
+		})
 	  },
 	  timeformat(time){
 			Number.prototype.padLeft = function(base,chr){
@@ -222,8 +261,9 @@
 	  }
     },
 	mounted(){
-		console.log(this.timeformat('2019-06-19T13:09:15.132Z'))
 		this.getData()
+		// this.$EventBus.$on('auth-token', () => {this.getData() });
+
 	}
   }
 </script>

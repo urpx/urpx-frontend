@@ -7,31 +7,30 @@
     lazy-validation
   >
     <v-text-field
-      v-model="name"
-      :rules="nameRules"
-      label="Name"
+      v-model="productName"
+      :rules="Rules"
+      label="제품명"
       required
     ></v-text-field>
 
     <v-text-field
-      v-model="email"
-      :rules="emailRules"
-      label="E-mail"
+      v-model="company"
+	  :rules="Rules"
+      label="제조사"
       required
     ></v-text-field>
 
-    <v-select
-      v-model="select"
-      :items="items"
-      :rules="[v => !!v || 'Item is required']"
-      label="Item"
+    <v-text-field
+      v-model="belongto"
+      :rules="Rules"
+      label="소속 부대"
       required
-    ></v-select>
+    ></v-text-field>
 
     <v-btn
       :disabled="!valid"
       color="success"
-      @click="validate"
+      @click="sendData"
     >
       Validate
     </v-btn>
@@ -51,35 +50,43 @@
   export default {
     data: () => ({
       valid: true,
-      name: '',
-      nameRules: [
-        v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+      productName: '',
+	  company : '',
+	  belongto : '',
+	  
+      Rules: [
+        v => !!v || 'required',
+        v => (v && v.length <= 10) || 'Name must be less than 30 characters'
       ],
-      email: '',
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+/.test(v) || 'E-mail must be valid'
-      ],
-      select: null,
-      items: [
-        'Item 1',
-        'Item 2',
-        'Item 3',
-        'Item 4'
-      ],
-      checkbox: false
     }),
 
     methods: {
       validate () {
         if (this.$refs.form.validate()) {
-          this.snackbar = true
+          	this.snackbar = true
+			return true
         }
       },
       reset () {
         this.$refs.form.reset()
       },
+	  sendData(){
+		let data = {
+			product_name : this.productName,
+			company : this.company,
+			belongto : this.belongto
+		} 
+		if(this.validate()){
+			this.$http.post(`/api/request`, data).then((res) => {
+
+				alert("접수 완료되었습니다.")
+				this.$refs.form.resetValidation()
+			})
+			.catch((e) => {
+				alert("서버 오류")
+			})
+		  }
+	 	}
 
     }
   }
