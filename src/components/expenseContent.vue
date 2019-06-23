@@ -248,7 +248,12 @@
 			   var  len = (String(base || 10).length - String(this).length)+1;
 			   return len > 0? new Array(len).join(chr || '0')+this : this;
 			}
-			var d = new Date(time),
+// 			UTC to KR +9hour
+			var tmp = new Date(time)
+			tmp.setHours(tmp.getHours() + 9);
+			
+			var d = tmp,
+				
 			dformat = [ d.getFullYear(),
 			(d.getMonth()+1).padLeft(),
 			d.getDate().padLeft()].join('/')+

@@ -2,7 +2,7 @@
 <v-container fluid grid-list-md>
   <v-layout row wrap>
     <v-flex class="card-section" xs12 sm12 md12 lg6 xl4>
-		<v-btn class="toggle-button" outline color="indigo" @click='drawGraph'> {{buttonMsg }} </v-btn>
+		<v-btn class="toggle-button" outline color="indigo" @click='drawGraph(); toggleMsg = !toggleMsg'> {{buttonMsg }} </v-btn>
 		<GChart class="spendchart"
 		  type="ColumnChart"
 		  :data="chartData"
@@ -32,7 +32,10 @@
 <script>
 
   import { GChart } from 'vue-google-charts'
-  import moment from 'moment'
+  import Moment from 'moment';
+  import { extendMoment } from 'moment-range';
+
+  const moment = extendMoment(Moment);
 	
   export default {
 	components : {
@@ -40,14 +43,7 @@
 	},
     data: () => ({
 	  toggleMsg : true,
-      chartData: [
-        ["Year", "Value"],
-        ["2014-08", 1000],
-        ["2015-07", 1170],
-        ["2016-06", 660],
-        ["2017-05", 1030],
-		["2018-06", 200]  
-      ],
+      chartData: [["Date", "Value"]],
       chartOptions: {
 		legend: { position: "none" },
       },
@@ -59,8 +55,8 @@
             sortable: false,
             value: 'created_at'
           },
-          { text: 'Amount', value: 'value' },
-          { text: 'Description', value: 'description' },
+          { text: 'Amount', value: 'value' ,sortable : false},
+          { text: 'Description', value: 'description' ,sortable : false },
         ],
     }),
 	computed:{
@@ -70,15 +66,36 @@
 	},
 	methods:{
 	  drawGraph(){
-		  this.toggleMsg = !this.toggleMsg
+		  
+		  this.chartData = []
+		  
 		  if(this.toggleMsg){
 			  //5일치에 대한 차트 계산
 			  //https://stackoverflow.com/questions/10430321/how-to-parse-a-dd-mm-yyyy-or-dd-mm-yyyy-or-dd-mmm-yyyy-formatted-date-stri
-			 
 			  
+			  var today = moment().format('L')
+			  var todayplus = moment(today).add(1,'days')
+			  
+			  for(let i = 0 ; i< 5; i++){
+				let range = moment.range(moment(today).subtract(i, 'days'),moment(todayplus).subtract(i, 'days'))
+				let graphArray = [], graphValue = 0
+				graphArray.push(moment(today).subtract(i, 'days').format('YYYY/MM/DD'))
+				  
+				this.rowItems.forEach((v, i) => {
+					var day = moment(v.created_at, "YYYY/MM/DD")
+					if(range.contains(day, { excludeEnd: true })){
+						graphValue += Number(v.amount)
+					}
+				})
+				graphArray.push(graphValue)  
+				this.chartData.unshift(graphArray)
+				
+			  }  
 		  }else{
 			  //5개월치에 대한 차트 계산
 		  }
+		  this.chartData.unshift(["Date", "Value"])
+		  console.log(this.chartData)
 	  },
 	  getData(){
 		  
@@ -90,7 +107,7 @@
 			})
 			this.rowItems = res.data.reverse()
 			console.log(this.rowItems)
-			
+			this.drawGraph()
 		})
 		.catch((e) => {
 			alert("서버오류")
@@ -102,9 +119,12 @@
 			   var  len = (String(base || 10).length - String(this).length)+1;
 			   return len > 0? new Array(len).join(chr || '0')+this : this;
 			}	
-            //UTC to KR +9hour
+			// 			UTC to KR +9hour
+			var tmp = new Date(time)
+			tmp.setHours(tmp.getHours() + 9);
 			
-			var d = new Date(time),
+			var d = tmp,
+			
 			dformat = [ d.getFullYear(),
 			(d.getMonth()+1).padLeft(),
 			d.getDate().padLeft()].join('/')+
@@ -119,6 +139,7 @@
 	  
 	mounted(){
 		this.getData()
+		
 	}
   }
 </script>
@@ -136,7 +157,7 @@
 			
 			.toggle-button{
 				position : absolute;
-				z-index : 9999 !important;
+				z-index : 5 !important;
 			}
 			
 			.spendchart{

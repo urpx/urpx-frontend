@@ -13,7 +13,7 @@
 			class="elevation-1"
 		  >
 			<template v-slot:items="props">
-			  <td>{{ props.index }}</td>
+			  <td>{{ props.index + 1 }}</td>
 			  <td><img class = "productimg" :src="props.item.img"/></td>
 			  <td class="text-xs-left">{{ props.item.name }}</td>
 			</template>
@@ -38,10 +38,38 @@
           
         ],
         itemlists: [
-          {
-           	img : "http://gdimg.gmarket.co.kr/193395843/still/300",
-			name : "사과"
-          },
+			{
+				img : "http://gdimg.gmarket.co.kr/1507538029/still/160?ver=0",
+				name : "코카콜라250ml"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/1112652990/still/160?ver=1544589650",
+				name : "홍삼보운"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/966567971/still/160?ver=1555999403",
+				name : "참존 마유크림 엑스트라 골든컴플렉스"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/1216642161/still/160?ver=1514905503",
+				name : "포카리스웨트 분말"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/1486631715/still/160?ver=1561286178",
+				name : "맥심카누콜롬비아블랜드마일드로스트아메리카노"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/1482460053/still/160?ver=1535095442",
+				name : "하루홍삼"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/1543141243/still/160?ver=1546584557",
+				name : "뉴트리팩"
+			},
+			{
+				img : "http://gdimg.gmarket.co.kr/1284603631/still/160?ver=0",
+				name : "육개장 컵라면"
+			},
         ]
 		
 	}),
