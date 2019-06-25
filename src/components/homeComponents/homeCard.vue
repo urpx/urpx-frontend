@@ -2,7 +2,7 @@
 <v-container fluid grid-list-md>
   <v-layout row wrap>
     <v-flex class="card-section" xs12 sm12 md12 lg6 xl4>
-		<v-btn class="toggle-button" outline color="indigo" @click='drawGraph(); toggleMsg = !toggleMsg'> {{buttonMsg }} </v-btn>
+		<v-btn class="toggle-button" outline color="indigo" @click='toggleMsg = !toggleMsg; drawGraph()'> {{buttonMsg }} </v-btn>
 		<GChart class="spendchart"
 		  type="ColumnChart"
 		  :data="chartData"
@@ -68,45 +68,40 @@
 	  drawGraph(){
 		  
 		  this.chartData = []
+		  //toggleMsg true면 5일치에 대한 차트 계산 false면 5개월치에 대한 차트 계산
+		  let criteriaMsg = this.toggleMsg ? 'days' : 'months';
+		  let criteriaFormat = this.toggleMsg ? 'YYYY/MM/DD' : 'YYYY/MM';
 		  
-		  if(this.toggleMsg){
-			  //5일치에 대한 차트 계산
-			  //https://stackoverflow.com/questions/10430321/how-to-parse-a-dd-mm-yyyy-or-dd-mm-yyyy-or-dd-mmm-yyyy-formatted-date-stri
-			  
-			  var today = moment().format('L')
-			  var todayplus = moment(today).add(1,'days')
-			  
-			  for(let i = 0 ; i< 5; i++){
-				let range = moment.range(moment(today).subtract(i, 'days'),moment(todayplus).subtract(i, 'days'))
-				let graphArray = [], graphValue = 0
-				graphArray.push(moment(today).subtract(i, 'days').format('YYYY/MM/DD'))
-				  
-				this.rowItems.forEach((v, i) => {
-					var day = moment(v.created_at, "YYYY/MM/DD")
-					if(range.contains(day, { excludeEnd: true })){
-						graphValue += Number(v.amount)
-					}
-				})
-				graphArray.push(graphValue)  
-				this.chartData.unshift(graphArray)
-				
-			  }  
-		  }else{
-			  //5개월치에 대한 차트 계산
-		  }
+		  let today = moment().format(criteriaFormat)
+		  let todayplus = moment(today).add(criteriaMsg, 1)
+		  
+		  
+		  for(let i = 0 ; i< 5; i++){
+			let range = moment.range(moment(today).subtract(criteriaMsg, i),moment(todayplus).subtract(criteriaMsg, i))
+			let graphArray = [], graphValue = 0
+			graphArray.push(moment(today).subtract(criteriaMsg, i).format(criteriaFormat))
+
+			this.rowItems.forEach((v, i) => {
+				let day = moment(v.created_at, criteriaFormat)
+				if(range.contains(day, { excludeEnd: true })){
+					graphValue += Number(v.amount)
+				}
+			})
+			graphArray.push(graphValue)  
+			this.chartData.unshift(graphArray)
+
+		  }  
+		  
 		  this.chartData.unshift(["Date", "Value"])
-		  console.log(this.chartData)
 	  },
 	  getData(){
 		  
 		this.rowItems = []
 		this.$http.get(`/api/expenses`).then((res) => {
-			console.log(res)
 			res.data.forEach((v, i) => {
 				v.created_at = this.timeformat(v.created_at)
 			})
 			this.rowItems = res.data.reverse()
-			console.log(this.rowItems)
 			this.drawGraph()
 		})
 		.catch((e) => {

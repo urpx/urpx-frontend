@@ -240,7 +240,7 @@
 		})
 		.catch((e) => {
 		
-			alert("서버 오류")
+			alert("서버 오류1")
 		})
 	  },
 	  timeformat(time){

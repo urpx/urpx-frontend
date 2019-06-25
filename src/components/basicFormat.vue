@@ -78,15 +78,15 @@
 	  
     },
 	created(){
-		this.token = this.$cookies.get("urpx_access_token");
-		this.changewindow();
+		// this.token = this.$cookies.get("urpx_access_token");
+		// this.changewindow();
 	},
     data: () => ({
       dialog: false,
 	  token : "",
 	  component : "",
       drawer: null,
-	  loinMessage : "로그인 하세요",
+	  loginMessage : "",
       items: [
         { icon: 'contacts', text: '메인' , route : '/' },
         { icon: 'history', text: '지출관리', route : '/expense'},
@@ -103,11 +103,12 @@
     },
 	watch:{
 		'token'(){
-			this.checkLoggedIn()
+	
 			try{
 				let token = this.$cookies.get("urpx_access_token")
 				this.$http.defaults.headers.common = {'Authorization': `Bearer ${token}`}
 				this.$EventBus.$emit('auth-token')
+				this.checkLoggedIn()
 			}catch(err){
 				
 			}
@@ -146,7 +147,7 @@
 		},
 		getUserInfo(id){
 			this.$http.get(`/api/users/${id}`).then((res) => {
-				console.log(res)
+
 			})
 			.catch((e) => {
 				
@@ -156,7 +157,7 @@
 	},
 	mounted(){
 		// this.changewindow();
-		// this.checkLoggedIn();
+		this.checkLoggedIn();
 		
 	}
   }
