@@ -202,7 +202,7 @@
 			res.data.forEach((v, i) => {
 				v.created_at = this.timeformat(v.created_at)
 			})
-			this.rowItems = res.data.reverse()
+			this.rowItems = res.data
 		})
 		.catch((e) => {
 			alert("서버 오류")

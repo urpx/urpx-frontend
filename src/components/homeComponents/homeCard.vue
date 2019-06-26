@@ -101,7 +101,7 @@
 			res.data.forEach((v, i) => {
 				v.created_at = this.timeformat(v.created_at)
 			})
-			this.rowItems = res.data.reverse()
+			this.rowItems = res.data
 			this.drawGraph()
 		})
 		.catch((e) => {
