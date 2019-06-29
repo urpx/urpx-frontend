@@ -14,14 +14,16 @@ export default {
   },
   created(){
 	  let token = this.$cookies.get("urpx_access_token")
-	  console.log(token)
 	  this.$http.defaults.headers.common = {'Authorization': `Bearer ${token}`}
-	  // this.$http.defaults.withCredentials = true
+
   },
   data () {
     return {
       
     }
+  },
+  mounted(){
+	  console.log("마운티드2")
   }
 }
 </script>

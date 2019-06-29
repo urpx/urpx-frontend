@@ -48,11 +48,11 @@
         <span class="hidden-sm-and-down">URPX</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-	  	<span>{{ loginMessage }}</span>
+	  	<span class = "message">{{ loginMessage }}</span>
     </v-toolbar>
     <v-content>
       <v-container>
-        <router-view></router-view>
+        <router-view :isLoggedIn = "isLoggedIn"></router-view>
       </v-container>
     </v-content>
    
@@ -78,13 +78,17 @@
 	  
     },
 	created(){
-		// this.token = this.$cookies.get("urpx_access_token");
-		// this.changewindow();
+		this.$EventBus.$on('logout', ()=>{
+			this.isLoggedIn = false
+			console.log("dddfdf");
+		})
 	},
     data: () => ({
       dialog: false,
 	  token : "",
+	  isLoggedIn : false,
 	  component : "",
+	  username : "",
       drawer: null,
 	  loginMessage : "",
       items: [
@@ -93,8 +97,8 @@
         { icon: 'content_copy', text: '판매현황', route : '/board'},
 		{ icon: 'content_copy', text: '물품추천', route : '/request'},
         { icon: 'chat_bubble', text: '로그인', route : '/login' },
-        { icon: 'help', text: 'Help', route :  '/' },
-        { icon: 'phonelink', text: 'App downloads', route :  '/' },
+        // { icon: 'help', text: 'Help', route :  '/' },
+        // { icon: 'phonelink', text: 'App downloads', route :  '/' },
 
       ]
     }),
@@ -102,16 +106,17 @@
       source: String
     },
 	watch:{
-		'token'(){
-	
-			try{
-				let token = this.$cookies.get("urpx_access_token")
-				this.$http.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+		$route (to, from){
+			
+			var self = this
+			console.log(to, from)
+			this.checkLoggedIn().then(() =>{
+				this.isLoggedIn = true
 				this.$EventBus.$emit('auth-token')
-				this.checkLoggedIn()
-			}catch(err){
-				
-			}
+			}).catch(function () {
+				alert("로그인 해주세요");
+				self.$router.push("/login")
+			})
 		}
 	},
 	methods : {
@@ -119,45 +124,61 @@
 		
 			this.$router.push(`${routelink}`)
 		},
-		changewindow(){
-			let route = window.location.href.split('/').pop()
-
-			switch(route){
-				case "" : this.component = "homeContent"; break;
-				case "expense" : this.component = "expenseContent"; break;
-				case "board" : this.component = "boardContent" ; break;
-				case "request" : this.component = "requestContent" ; break;
-				case "request" : this.component = "requestContent" ; break;
-				case "login" : this.component = "loginContent" ; break;
-			}
-		},
 		checkLoggedIn(){
-			let token = this.$cookies.get("urpx_access_token");
 
-			try{
-				let decoded = jwtDecode(token);
-				this.getUserInfo(decoded.identity)
-				this.loginMessage = "안녕하세요"
+			return new Promise((resolve, reject) => {
+				let token = this.$cookies.get("urpx_access_token");
+			    this.$http.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+				try{
+					let decoded = jwtDecode(token);
+					this.getUserInfo(decoded.identity).then((res, rej)=>{
+						return resolve()
+					}).catch(()=>{
+						console.log("에러 났는데요")
+						return reject()
+					})
+
+				} catch(err){
+					this.loginMessage = "로그인 하세요"
+					return reject()
+
+				}
 				
-				
-			} catch(err){
-				this.loginMessage = "로그인 하세요"
-				
-			}
+			})
+			
 		},
 		getUserInfo(id){
-			this.$http.get(`/api/users/${id}`).then((res) => {
+			return new Promise((resolve, reject)=>{
 
-			})
-			.catch((e) => {
-				
-				this.loginMessage = "로그인 하세요"
+				this.$http.get(`/api/users/${id}`).then((res) => {
+					console.log(res)
+					console.log("유저정보")
+					this.username = res.data.username
+					this.loginMessage = `안녕하세요 ${this.username}님`
+					return resolve()
+				})
+				.catch((e) => {
+
+					this.loginMessage = "로그인 하세요"
+					return reject()
+				})
 			})
 		}
 	},
 	mounted(){
-		// this.changewindow();
-		this.checkLoggedIn();
+		
+		var self = this
+		this.$EventBus.$on('logout', ()=>{
+			this.isLoggedIn = false
+			console.log("dddfdf");
+		})
+		
+		this.checkLoggedIn().then(() =>{
+			this.isLoggedIn = true
+			this.$EventBus.$emit('auth-token')
+		}).catch(()=>{
+			self.$router.push("/login")
+		})
 		
 	}
   }
@@ -167,6 +188,10 @@
 
 	.v-content{
 		padding : 0 !important;
+	}
+	.message{
+		display : block;
+		min-width : 100px;
 	}
 	
 </style>

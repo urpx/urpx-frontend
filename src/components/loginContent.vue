@@ -3,21 +3,25 @@
         <v-layout align-center="align-center" justify-center="justify-center">
             <v-flex class="login-form text-xs-center">
                 <v-card light="light">
-                    <v-card-text>
-                        <div class="subheading"><template v-if="options.isLoggingIn">URPX 로그인</template><template v-else="v-else">Crate a new account</template></div>
+                    <v-card-text v-if="!isLoggedIn">
+                        <div class="subheading"><template v-if="isLoggingIn">URPX 로그인</template><template v-else="v-else">Crate a new account</template></div>
                         <v-form>
-                            <v-text-field v-if="!options.isLoggingIn" v-model="user.name" light="light" prepend-icon="person" label="Name"></v-text-field>
+                            <v-text-field v-if="!isLoggingIn" v-model="user.name" light="light" prepend-icon="person" label="Name"></v-text-field>
                             <v-text-field v-model="user.email" light="light" prepend-icon="email" label="Email" type="email"></v-text-field>
                             <v-text-field v-model="user.password" light="light" prepend-icon="lock" label="Password" type="password"></v-text-field>
-                            <v-text-field v-if="!options.isLoggingIn" v-model="user.passwordRepeat" light="light" prepend-icon="lock" label="Password Repeat" type="password"></v-text-field>
-                            <v-btn v-if="options.isLoggingIn" @click.prevent="login()" block="block" type="submit">Sign in</v-btn>
-                            <v-btn v-if="!options.isLoggingIn" block="block" type="submit" @click.prevent="sign();">Sign up</v-btn>
-							<v-btn v-if="!options.isLoggingIn" block="block" type="submit" @click.prevent="back();">return</v-btn>
+                            <v-text-field v-if="!isLoggingIn" v-model="user.passwordRepeat" light="light" prepend-icon="lock" label="Password Repeat" type="password"></v-text-field>
+                            <v-btn v-if="isLoggingIn" @click.prevent="login()" block="block" type="submit">Sign in</v-btn>
+                            <v-btn v-if="!isLoggingIn" block="block" type="submit" @click.prevent="sign();">Sign up</v-btn>
+							<v-btn v-if="!isLoggingIn" block="block" type="submit" @click.prevent="back();">return</v-btn>
                         </v-form>
                     </v-card-text>
+					<v-card-text v-else>
+						<span> 로그인 한 상태</span>
+						<v-btn @click.prevent="logout()">로그 아웃</v-btn>
+					</v-card-text>
                 </v-card>
-                <div v-if="options.isLoggingIn">Don't have an account?
-                    <v-btn light="light" @click="options.isLoggingIn = false;">Sign up</v-btn>
+                <div v-if="isLoggingIn && !isLoggedIn">Don't have an account?
+                    <v-btn light="light" @click="isLoggingIn = false;">Sign up</v-btn>
                 </div>
             </v-flex>
         </v-layout>
@@ -25,8 +29,9 @@
 </template>
 
 <script>
-// https://codepen.io/madyanalj/pen/KRXxpN
+ var jwtDecode = require('jwt-decode');
   export default {
+	props: ['isLoggedIn'],
     data: () => ({
 		user: {
 			name : '',
@@ -34,15 +39,14 @@
 			password : '',
 			passwordRepeat : '',
     	},
-    options: {
       isLoggingIn: true,
-     
-    },
+    
     }),
+	
 	methods : {
 		back(){
 			this.initialize()
-			this.options.isLoggingIn = true
+			this.isLoggingIn = true
 		},
 		login(){
 			let data = {
@@ -74,7 +78,7 @@
 				
 			}
 			this.$http.post('/api/users', data).then((res) => {
-				 this.options.isLoggingIn = true
+				 this.isLoggingIn = true
 				 this.initialize()
 			})
 			.catch((e) => {
@@ -87,6 +91,12 @@
 
 			})
 		},
+		logout(){
+			this.isLoggingIn = true,
+			this.isLoggedIn = false//false 되어야 함
+			this.$cookies.remove("urpx_access_token")
+			this.$EventBus.$emit('logout')
+		},
 		initialize(){
 			this.user.email = "",
 			this.user.name = "",
@@ -94,9 +104,12 @@
 			this.user.passwordRepeat = ""
 		}
 		
+
+		
 	},
 	mounted(){
-
+		console.log(this.isLoggedIn)
+		
 	}
   }
 </script>

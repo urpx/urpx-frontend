@@ -152,7 +152,9 @@
     },
 
     methods: {
-
+	  initialize(){
+		  
+	  },
       editItem (item) {
         this.editedIndex = this.rowItems.indexOf(item)
         this.editedItem = Object.assign({}, item)
@@ -266,8 +268,8 @@
 	  }
     },
 	mounted(){
-		this.getData()
-		// this.$EventBus.$on('auth-token', () => {this.getData() });
+
+		this.$EventBus.$once('auth-token', () => { this.getData()});
 
 	}
   }

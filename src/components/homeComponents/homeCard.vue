@@ -105,7 +105,7 @@
 			this.drawGraph()
 		})
 		.catch((e) => {
-			alert("서버오류")
+			
 		})
 	  },
 	  timeformat(time){
@@ -133,8 +133,8 @@
 	},
 	  
 	mounted(){
-		this.getData()
-		
+		this.$EventBus.$once('auth-token', () => { this.getData()});
+
 	}
   }
 </script>

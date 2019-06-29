@@ -4,8 +4,8 @@
 			<v-container fluid grid-list-md >
 			  <v-layout row wrap>
 				<v-flex xs4 sm3 md2 lg2 xl1
-				  v-for="card in cardItem"
-				  :key="card"
+				  v-for="(card, idx) in cardItem"
+				  :key="idx"
 				>
 							<v-img
 					  :src="card.image_200px"
@@ -35,17 +35,7 @@ import moment from 'moment'
 	methods : {
 		  getData(){
 			let date = moment().format()
-			// console.log(moment(date).subtract('months', 1))
-			// console.log(moment(date).subtract('months', 2))
-			// console.log(moment(date).subtract('months', 3))
-			// console.log(moment(date).subtract('months', 4))
-			// console.log(moment(date).subtract('months', 5))
-			// console.log(moment(date).subtract('months', 6))
-			// console.log(moment(date).subtract('months', 7))
-			// console.log(moment(date).subtract('months', 8))
-			// console.log(moment(date).subtract('months', 9))
-			// console.log(moment(date).year())
-			// console.log(moment(date).month())
+
 			let query = {
 				offset : 0,
 				count : 9
@@ -77,7 +67,8 @@ import moment from 'moment'
 	  
   },
 	mounted(){
-		this.getData()
+		this.$EventBus.$on('auth-token', () => { console.log("토큰 받기 서버 로그인") ; this.getData()});
+		console.log("마운티드")
 	}
 //online ide 만들기 코딩 채점 테스트 환경 만들기
 	  
