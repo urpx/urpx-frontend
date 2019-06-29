@@ -94,6 +94,9 @@
 
 <script>
   export default {
+    props: {
+	  isLoggedIn : String
+    },
     data: () => ({
       dialog: false,
 	  valid : true,
@@ -269,7 +272,11 @@
     },
 	mounted(){
 
-		this.$EventBus.$once('auth-token', () => { this.getData()});
+		if(this.isLoggedIn){
+			this.getData()
+		}
+
+		// this.$EventBus.$once('auth-token', () => { this.getData()});
 
 	}
   }

@@ -23,7 +23,7 @@ export default {
     }
   },
   mounted(){
-	  console.log("마운티드2")
+	
   }
 }
 </script>

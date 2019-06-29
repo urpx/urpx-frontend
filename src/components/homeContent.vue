@@ -49,7 +49,6 @@ import moment from 'moment'
 			
 			this.$http.get(`/api/products/amount/${year}/${month}`, {params : query}).then((res) => {
 				this.cardItem = res.data
-				console.log(this.cardItem)
 				if(this.cardItem.length){
 					
 					
@@ -67,8 +66,8 @@ import moment from 'moment'
 	  
   },
 	mounted(){
-		this.$EventBus.$on('auth-token', () => { console.log("토큰 받기 서버 로그인") ; this.getData()});
-		console.log("마운티드")
+		this.$EventBus.$on('auth-token', () => {  this.getData()});
+
 	}
 //online ide 만들기 코딩 채점 테스트 환경 만들기
 	  

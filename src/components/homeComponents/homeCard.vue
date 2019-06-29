@@ -41,6 +41,9 @@
 	components : {
 	  GChart	
 	},
+    props: {
+	  isLoggedIn : String
+    },
     data: () => ({
 	  toggleMsg : true,
       chartData: [["Date", "Value"]],
@@ -133,6 +136,7 @@
 	},
 	  
 	mounted(){
+		
 		this.$EventBus.$once('auth-token', () => { this.getData()});
 
 	}

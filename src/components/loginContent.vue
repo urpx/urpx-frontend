@@ -16,7 +16,7 @@
                         </v-form>
                     </v-card-text>
 					<v-card-text v-else>
-						<span> 로그인 한 상태</span>
+						<span class = 'login-message'> URPX 로그아웃</span>
 						<v-btn @click.prevent="logout()">로그 아웃</v-btn>
 					</v-card-text>
                 </v-card>
@@ -31,7 +31,10 @@
 <script>
  var jwtDecode = require('jwt-decode');
   export default {
-	props: ['isLoggedIn'],
+	  
+    props: {
+	  isLoggedIn : String
+    },
     data: () => ({
 		user: {
 			name : '',
@@ -83,7 +86,6 @@
 			})
 			.catch((e) => {
 				var msg = e.response.status
-				console.log(msg)
 				switch(msg){
 					case 422 : alert("이미 등록된 계정입니다."); break;
 					default : alert("서버 오류입니다."); break;
@@ -96,6 +98,7 @@
 			this.isLoggedIn = false//false 되어야 함
 			this.$cookies.remove("urpx_access_token")
 			this.$EventBus.$emit('logout')
+			
 		},
 		initialize(){
 			this.user.email = "",
@@ -108,7 +111,6 @@
 		
 	},
 	mounted(){
-		console.log(this.isLoggedIn)
 		
 	}
   }
@@ -117,6 +119,9 @@
 <style lang="scss" scoped>
 	.login-form{
 		max-width : 500px;
+	}
+	.login-message{
+		display : block;
 	}
 	
 </style>

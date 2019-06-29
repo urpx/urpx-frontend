@@ -70,6 +70,9 @@
 
 <script>
   export default {
+    props: {
+	  isLoggedIn : String
+    },
     data: () => ({
       valid: true,
       productName: '',
@@ -137,7 +140,10 @@
 
     },
 	mounted(){
-		this.getData()
+		if(this.isLoggedIn){
+			this.getData()
+		}
+	
 	}
   }
 </script>

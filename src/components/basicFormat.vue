@@ -23,7 +23,7 @@
               <a href="#!" class="body-2 black--text">EDIT</a>
             </v-flex>
           </v-layout>
-          <v-list-tile v-else :key="item.text" @click="route(item.route)">
+          <v-list-tile v-else :key="item.text" @click="route(item.route) ;  drawer = !drawer">
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
@@ -79,8 +79,8 @@
     },
 	created(){
 		this.$EventBus.$on('logout', ()=>{
+			this.loginMessage = "로그인 하세요"
 			this.isLoggedIn = false
-			console.log("dddfdf");
 		})
 	},
     data: () => ({
@@ -109,7 +109,6 @@
 		$route (to, from){
 			
 			var self = this
-			console.log(to, from)
 			this.checkLoggedIn().then(() =>{
 				this.isLoggedIn = true
 				this.$EventBus.$emit('auth-token')
@@ -117,24 +116,36 @@
 				alert("로그인 해주세요");
 				self.$router.push("/login")
 			})
+		},
+		isLoggedIn(){
+			// if(thi)
+			// console.log("로그인 확인")
+			// console.log(this)
 		}
 	},
 	methods : {
 		route(routelink){
-		
-			this.$router.push(`${routelink}`)
+			if(this.isLoggedIn){
+				this.$router.push(`${routelink}`)
+			}else{
+				this.$router.push("/login")
+				alert("로그인 해주세요")
+			}
 		},
 		checkLoggedIn(){
 
 			return new Promise((resolve, reject) => {
 				let token = this.$cookies.get("urpx_access_token");
 			    this.$http.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+				
 				try{
 					let decoded = jwtDecode(token);
 					this.getUserInfo(decoded.identity).then((res, rej)=>{
+					
 						return resolve()
 					}).catch(()=>{
-						console.log("에러 났는데요")
+					
+					
 						return reject()
 					})
 
@@ -151,8 +162,7 @@
 			return new Promise((resolve, reject)=>{
 
 				this.$http.get(`/api/users/${id}`).then((res) => {
-					console.log(res)
-					console.log("유저정보")
+
 					this.username = res.data.username
 					this.loginMessage = `안녕하세요 ${this.username}님`
 					return resolve()
@@ -168,10 +178,6 @@
 	mounted(){
 		
 		var self = this
-		this.$EventBus.$on('logout', ()=>{
-			this.isLoggedIn = false
-			console.log("dddfdf");
-		})
 		
 		this.checkLoggedIn().then(() =>{
 			this.isLoggedIn = true

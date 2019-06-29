@@ -70,9 +70,7 @@
 				count : 20
 			}
 			
-			console.log(year)
-			console.log(month)
-			
+
 			this.$http.get(`/api/products/${this.category}/${year}/${month}`, {params : query}).then((res) => {
 				this.itemlists = res.data
 			})
@@ -81,9 +79,7 @@
 			})			
 		},
 		toggleData(){
-			console.log("클릭")
-			
-			
+
 			if(this.category == "cost"){
 				this.category = "amount"
 				this.getData()
@@ -91,7 +87,7 @@
 				this.category = "cost"
 				this.getData()
 			}
-			console.log(this.category)
+	
 		}
 	},
 	mounted(){
