@@ -23,7 +23,7 @@
               <a href="#!" class="body-2 black--text">EDIT</a>
             </v-flex>
           </v-layout>
-          <v-list-tile v-else :key="item.text" @click="route(item.route) ;  drawer = !drawer">
+          <v-list-tile v-else :key="item.text" @click="route(item.route) ;">
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
